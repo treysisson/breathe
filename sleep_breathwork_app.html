@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Breathwork</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e8e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            background: linear-gradient(45deg, #64b5f6, #42a5f5, #1e88e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .app-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Technique selector */
+        .technique-selector {
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .technique-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .technique-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(100, 181, 246, 0.3);
+            color: #e8e8f0;
+            padding: 15px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .technique-btn:hover {
+            background: rgba(100, 181, 246, 0.2);
+            border-color: rgba(100, 181, 246, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .technique-btn.active {
+            background: rgba(100, 181, 246, 0.3);
+            border-color: #64b5f6;
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.4);
+        }
+
+        .technique-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .technique-pattern {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .technique-description {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 181, 246, 0.2);
+        }
+
+        .technique-description h4 {
+            color: #64b5f6;
+            margin-bottom: 8px;
+        }
+
+        /* Breathing circle */
+        .breathing-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .breathing-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 181, 246, 0.3), rgba(30, 136, 229, 0.1));
+            border: 3px solid rgba(100, 181, 246, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(100, 181, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breathing-circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .breathing-text {
+            font-size: 2rem;
+            font-weight: 300;
+            z-index: 2;
+            text-shadow: 0 0 10px rgba(100, 181, 246, 0.5);
+        }
+
+        /* Control buttons */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(100, 181, 246, 0.4);
+            color: #e8e8f0;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(100, 181, 246, 0.2);
+            border-color: #64b5f6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 181, 246, 0.3);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn.primary {
+            background: rgba(100, 181, 246, 0.3);
+            border-color: #64b5f6;
+        }
+
+        /* Progress section */
+        .progress-section {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #64b5f6, #42a5f5);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(100, 181, 246, 0.5);
+        }
+
+        .phase-indicator {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #64b5f6;
+        }
+
+        /* Animations */
+        @keyframes breatheIn {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.3); }
+        }
+
+        @keyframes breatheOut {
+            0% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes hold {
+            0%, 100% { transform: scale(1.3); }
+        }
+
+        .inhale { animation: breatheIn ease-in-out forwards; }
+        .hold { animation: hold ease-in-out forwards; }
+        .exhale { animation: breatheOut ease-in-out forwards; }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .app-title {
+                font-size: 2rem;
+            }
+
+            .breathing-circle {
+                width: 200px;
+                height: 200px;
+            }
+
+            .breathing-text {
+                font-size: 1.5rem;
+            }
+
+            .technique-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .controls {
+                gap: 10px;
+            }
+
+            .control-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .breathing-circle {
+                width: 180px;
+                height: 180px;
+            }
+
+            .breathing-text {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <div class="app-header">
+            <h1 class="app-title">Sleep Breathwork</h1>
+            <p class="app-subtitle">Guided breathing techniques for better sleep</p>
+        </div>
+
+        <div class="technique-selector">
+            <div class="technique-grid">
+                <button class="technique-btn active" data-technique="4-7-8">
+                    <div class="technique-name">4-7-8</div>
+                    <div class="technique-pattern">4s • 7s • 8s</div>
+                </button>
+                <button class="technique-btn" data-technique="box">
+                    <div class="technique-name">Box Breathing</div>
+                    <div class="technique-pattern">4s • 4s • 4s • 4s</div>
+                </button>
+                <button class="technique-btn" data-technique="triangle">
+                    <div class="technique-name">Triangle</div>
+                    <div class="technique-pattern">4s • 4s • 4s</div>
+                </button>
+            </div>
+
+            <div class="technique-description" id="techniqueDescription">
+                <h4>4-7-8 Breathing</h4>
+                <p>Known as the "natural tranquilizer," this technique helps calm the nervous system and promotes deep sleep by regulating oxygen and carbon dioxide levels.</p>
+            </div>
+        </div>
+
+        <div class="breathing-container">
+            <div class="breathing-circle" id="breathingCircle">
+                <div class="breathing-text" id="breathingText">Prepare</div>
+            </div>
+            
+            <div class="phase-indicator" id="phaseIndicator">Get ready to begin</div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn primary" id="startBtn">Start</button>
+            <button class="control-btn" id="pauseBtn" style="display: none;">Pause</button>
+            <button class="control-btn" id="resumeBtn" style="display: none;">Resume</button>
+            <button class="control-btn" id="stopBtn" style="display: none;">Stop</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-info">
+                <span>Cycle: <span id="cycleCount">0</span></span>
+                <span>Time: <span id="sessionTime">0:00</span></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BreathworkApp {
+            constructor() {
+                this.techniques = {
+                    '4-7-8': {
+                        name: '4-7-8 Breathing',
+                        description: 'Known as the "natural tranquilizer," this technique helps calm the nervous system and promotes deep sleep by regulating oxygen and carbon dioxide levels.',
+                        pattern: [
+                            { phase: 'Breathe In', duration: 4000, animation: 'inhale' },
+                            { phase: 'Hold', duration: 7000, animation: 'hold' },
+                            { phase: 'Breathe Out', duration: 8000, animation: 'exhale' }
+                        ]
+                    },
+                    'box': {
+                        name: 'Box Breathing',
+                        description: 'Also known as square breathing, this technique promotes relaxation and mental clarity by creating a steady, balanced rhythm that activates the parasympathetic nervous system.',
+                        pattern: [
+                            { phase: 'Breathe In', duration: 4000, animation: 'inhale' },
+                            { phase: 'Hold', duration: 4000, animation: 'hold' },
+                            { phase: 'Breathe Out', duration: 4000, animation: 'exhale' },
+                            { phase: 'Hold', duration: 4000, animation: 'hold' }
+                        ]
+                    },
+                    'triangle': {
+                        name: 'Triangle Breathing',
+                        description: 'A simple three-phase technique that helps reduce anxiety and prepare the mind for sleep through equal timing of inhale, hold, and exhale phases.',
+                        pattern: [
+                            { phase: 'Breathe In', duration: 4000, animation: 'inhale' },
+                            { phase: 'Hold', duration: 4000, animation: 'hold' },
+                            { phase: 'Breathe Out', duration: 4000, animation: 'exhale' }
+                        ]
+                    }
+                };
+
+                this.currentTechnique = '4-7-8';
+                this.isActive = false;
+                this.isPaused = false;
+                this.currentPhase = 0;
+                this.cycleCount = 0;
+                this.sessionStartTime = null;
+                this.sessionTimer = null;
+                this.phaseTimer = null;
+                this.phaseProgress = 0;
+
+                this.initializeElements();
+                this.initializeStars();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.breathingCircle = document.getElementById('breathingCircle');
+                this.breathingText = document.getElementById('breathingText');
+                this.phaseIndicator = document.getElementById('phaseIndicator');
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.resumeBtn = document.getElementById('resumeBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.cycleCountEl = document.getElementById('cycleCount');
+                this.sessionTimeEl = document.getElementById('sessionTime');
+                this.progressFill = document.getElementById('progressFill');
+                this.techniqueDescription = document.getElementById('techniqueDescription');
+            }
+
+            initializeStars() {
+                const starsContainer = document.getElementById('stars');
+                for (let i = 0; i < 50; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 3 + 's';
+                    starsContainer.appendChild(star);
+                }
+            }
+
+            bindEvents() {
+                // Technique selection
+                document.querySelectorAll('.technique-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (this.isActive) return;
+                        
+                        document.querySelector('.technique-btn.active').classList.remove('active');
+                        btn.classList.add('active');
+                        this.currentTechnique = btn.dataset.technique;
+                        this.updateTechniqueDescription();
+                    });
+                });
+
+                // Control buttons
+                this.startBtn.addEventListener('click', () => this.startSession());
+                this.pauseBtn.addEventListener('click', () => this.pauseSession());
+                this.resumeBtn.addEventListener('click', () => this.resumeSession());
+                this.stopBtn.addEventListener('click', () => this.stopSession());
+            }
+
+            updateTechniqueDescription() {
+                const technique = this.techniques[this.currentTechnique];
+                this.techniqueDescription.innerHTML = `
+                    <h4>${technique.name}</h4>
+                    <p>${technique.description}</p>
+                `;
+            }
+
+            startSession() {
+                this.isActive = true;
+                this.isPaused = false;
+                this.currentPhase = 0;
+                this.cycleCount = 0;
+                this.sessionStartTime = Date.now();
+                
+                this.updateUI();
+                this.startSessionTimer();
+                this.startBreathingCycle();
+                
+                // Disable technique switching during session
+                document.querySelectorAll('.technique-btn').forEach(btn => {
+                    btn.style.pointerEvents = 'none';
+                    btn.style.opacity = '0.5';
+                });
+            }
+
+            pauseSession() {
+                this.isPaused = true;
+                clearTimeout(this.phaseTimer);
+                clearInterval(this.sessionTimer);
+                this.updateUI();
+            }
+
+            resumeSession() {
+                this.isPaused = false;
+                this.sessionStartTime = Date.now() - (this.cycleCount * this.getTotalCycleDuration());
+                this.startSessionTimer();
+                this.continueBreathingCycle();
+                this.updateUI();
+            }
+
+            stopSession() {
+                this.isActive = false;
+                this.isPaused = false;
+                clearTimeout(this.phaseTimer);
+                clearInterval(this.sessionTimer);
+                
+                this.breathingCircle.className = 'breathing-circle';
+                this.breathingText.textContent = 'Prepare';
+                this.phaseIndicator.textContent = 'Get ready to begin';
+                this.progressFill.style.width = '0%';
+                
+                this.updateUI();
+                
+                // Re-enable technique switching
+                document.querySelectorAll('.technique-btn').forEach(btn => {
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.opacity = '1';
+                });
+            }
+
+            startBreathingCycle() {
+                if (this.currentPhase === 0) {
+                    this.cycleCount++;
+                    this.cycleCountEl.textContent = this.cycleCount;
+                }
+                this.executePhase();
+            }
+
+            continueBreathingCycle() {
+                const remainingTime = this.calculateRemainingPhaseTime();
+                this.executePhase(remainingTime);
+            }
+
+            executePhase(customDuration = null) {
+                if (!this.isActive || this.isPaused) return;
+
+                const technique = this.techniques[this.currentTechnique];
+                const phase = technique.pattern[this.currentPhase];
+                const duration = customDuration || phase.duration;
+
+                this.breathingText.textContent = phase.phase;
+                this.phaseIndicator.textContent = phase.phase;
+                
+                // Apply animation
+                this.breathingCircle.className = `breathing-circle ${phase.animation}`;
+                this.breathingCircle.style.animationDuration = duration + 'ms';
+
+                // Start progress animation for this phase
+                this.startPhaseProgress(duration);
+
+                this.phaseTimer = setTimeout(() => {
+                    this.currentPhase = (this.currentPhase + 1) % technique.pattern.length;
+                    
+                    if (this.currentPhase === 0) {
+                        // Cycle complete, start next cycle
+                        setTimeout(() => this.startBreathingCycle(), 500);
+                    } else {
+                        // Continue to next phase
+                        this.executePhase();
+                    }
+                }, duration);
+            }
+
+            startPhaseProgress(phaseDuration) {
+                const technique = this.techniques[this.currentTechnique];
+                const totalCycleDuration = technique.pattern.reduce((sum, phase) => sum + phase.duration, 0);
+                
+                // Calculate where this phase starts in the overall cycle
+                const phaseStartDuration = technique.pattern.slice(0, this.currentPhase)
+                    .reduce((sum, phase) => sum + phase.duration, 0);
+                
+                const startPercent = (phaseStartDuration / totalCycleDuration) * 100;
+                const endPercent = ((phaseStartDuration + phaseDuration) / totalCycleDuration) * 100;
+                
+                // Set initial progress
+                this.progressFill.style.width = startPercent + '%';
+                
+                // Animate progress smoothly over the phase duration
+                let startTime = Date.now();
+                const updateProgress = () => {
+                    if (!this.isActive || this.isPaused) return;
+                    
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / phaseDuration, 1);
+                    const currentPercent = startPercent + (endPercent - startPercent) * progress;
+                    
+                    this.progressFill.style.width = currentPercent + '%';
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateProgress);
+                    }
+                };
+                
+                requestAnimationFrame(updateProgress);
+            }
+
+            getTotalCycleDuration() {
+                const technique = this.techniques[this.currentTechnique];
+                return technique.pattern.reduce((sum, phase) => sum + phase.duration, 0);
+            }
+
+            calculateRemainingPhaseTime() {
+                // This is a simplified calculation for demo purposes
+                // In a real app, you'd need to track exact phase timing
+                const technique = this.techniques[this.currentTechnique];
+                return technique.pattern[this.currentPhase].duration;
+            }
+
+            startSessionTimer() {
+                this.sessionTimer = setInterval(() => {
+                    const elapsed = Date.now() - this.sessionStartTime;
+                    const minutes = Math.floor(elapsed / 60000);
+                    const seconds = Math.floor((elapsed % 60000) / 1000);
+                    this.sessionTimeEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            updateUI() {
+                if (this.isActive && !this.isPaused) {
+                    this.startBtn.style.display = 'none';
+                    this.pauseBtn.style.display = 'inline-block';
+                    this.resumeBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'inline-block';
+                } else if (this.isActive && this.isPaused) {
+                    this.startBtn.style.display = 'none';
+                    this.pauseBtn.style.display = 'none';
+                    this.resumeBtn.style.display = 'inline-block';
+                    this.stopBtn.style.display = 'inline-block';
+                } else {
+                    this.startBtn.style.display = 'inline-block';
+                    this.pauseBtn.style.display = 'none';
+                    this.resumeBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new BreathworkApp();
+        });
+    </script>
+</body>
+</html>
